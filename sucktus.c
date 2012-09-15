@@ -9,98 +9,16 @@
 #include <unistd.h>
 #include <time.h>
 #include <X11/Xlib.h>
-#include <pulse/pulseaudio.h>
 
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 
 static Display *dpy;
-static pa_mainloop_api *mainloop_api = NULL;
-static char volume[PA_CVOLUME_SNPRINT_MAX];
 
 void setstatus(char *str) {
     XStoreName(dpy, DefaultRootWindow(dpy), str);
     XSync(dpy, False);
-}
-
-static void context_drain_complete(pa_context *c, void *userdata) {
-    pa_context_disconnect(c);
-}
-
-static void volume_cb(pa_context *c, const pa_sink_info *i, int is_last, void *userdata) {
-    pa_operation *o;
-    char *v = userdata;
-
-    if (i->mute) {
-        strncpy(v, "off ", 4);
-    } else {
-        char tmp[PA_CVOLUME_SNPRINT_MAX];
-        char *pch;
-
-        pa_cvolume_snprint(tmp, sizeof(tmp), &i->volume);
-        pch = strpbrk(tmp, ":");
-        pch+=2;
-
-        strncpy(v, pch, 4);
-    }
-
-    if (!(o = pa_context_drain(c, context_drain_complete, NULL)))
-        pa_context_disconnect(c);
-    else
-        pa_operation_unref(o);
-}
-
-static void context_state_callback(pa_context *c, void *userdata) {
-    switch (pa_context_get_state(c)) {
-        case PA_CONTEXT_READY:
-            pa_operation_unref(pa_context_get_sink_info_by_index(c, 0, volume_cb, userdata));
-            break;
-
-        case PA_CONTEXT_TERMINATED:
-            mainloop_api->quit(mainloop_api, 0);
-            break;
-
-        case PA_CONTEXT_FAILED:
-            mainloop_api->quit(mainloop_api, -1);
-            break;
-
-        default:
-            ;
-    }
-}
-
-char *getvolume() {
-    pa_mainloop *m = NULL;
-    pa_context *context = NULL;
-    int ret = 0;
-    
-    if (!(m = pa_mainloop_new()))
-        goto quit;
-
-    mainloop_api = pa_mainloop_get_api(m);
-    pa_signal_init(mainloop_api);
-
-    if (!(context = pa_context_new(mainloop_api, NULL))) 
-        goto quit;
-
-    pa_context_set_state_callback(context, context_state_callback, &volume);
-    if (pa_context_connect(context, NULL, 0, NULL) < 0)
-        goto quit;
-
-    if (pa_mainloop_run(m, &ret) < 0)
-        goto quit;
-
-quit:
-    if (context)
-        pa_context_unref(context);
-
-    if (m) {
-        pa_signal_done();
-        pa_mainloop_free(m);
-    }
-
-    return volume;
 }
 
 float getmeminfo() {
@@ -317,7 +235,6 @@ int main(void) {
         exit(1);
     
     for (;;sleep(1)) {
-//        getvolume();
         datetime = getdatetime();
         mem = getmeminfo();
         bat0 = getbattery();
