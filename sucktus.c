@@ -34,7 +34,7 @@ float getmeminfo() {
     } meminfo;
 
     fd = fopen("/proc/meminfo", "r");
-    if(fd == NULL) {
+    if (fd == NULL) {
         printf("canot opent file\n");
         exit(1);
     }
@@ -57,17 +57,17 @@ char *getdatetime() {
     time_t result;
     struct tm *resulttm;
 
-    if((buf = malloc(sizeof(char)*65)) == NULL) {
+    if ((buf = malloc(sizeof(char)*65)) == NULL) {
         fprintf(stderr, "Cannot allocate memory for buf.\n");
         exit(1);
     }
     result = time(NULL);
     resulttm = localtime(&result);
-    if(resulttm == NULL) {
+    if (resulttm == NULL) {
         fprintf(stderr, "Error getting localtime.\n");
         exit(1);
     }
-    if(!strftime(buf, sizeof(char)*65-1, "%a %b %d %H:%M:%S", resulttm)) {
+    if (!strftime(buf, sizeof(char)*65-1, "%a %b %d %H:%M:%S", resulttm)) {
         fprintf(stderr, "strftime is 0.\n");
         exit(1);
     }
@@ -106,7 +106,7 @@ int getbattery() {
 	perc = ((float)energy_now * 1000 / (float)voltage_now) * 100;
     perc /= ((float)energy_full * 1000 / (float)voltage_now);
 
-    if(perc > 100)
+    if (perc > 100)
         return 100;
     else
         return perc;
@@ -231,7 +231,7 @@ int main(void) {
         return 1;
     }
 
-    if((status = malloc(200)) == NULL)
+    if ((status = malloc(200)) == NULL)
         exit(1);
 
     for (;;sleep(1)) {
@@ -240,7 +240,7 @@ int main(void) {
         bat0 = getbattery();
         address = getaddress("wlan0");
 
-        if(ischarging())
+        if (ischarging())
             strcpy(battext, "ac:");
         else {
             if (bat0 > 70)
