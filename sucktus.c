@@ -38,7 +38,7 @@ float getmeminfo() {
         printf("canot opent file\n");
         exit(1);
     }
-    
+
     fscanf(fd, "MemTotal: %ld kB", &meminfo.total);
     fscanf(fd, " MemFree: %ld kB", &meminfo.free);
     fscanf(fd, " Buffers: %ld kB", &meminfo.buffers);
@@ -71,7 +71,7 @@ char *getdatetime() {
         fprintf(stderr, "strftime is 0.\n");
         exit(1);
     }
-    
+
     return buf;
 }
 
@@ -103,9 +103,9 @@ int getbattery() {
 	fscanf(fd, "%d", &voltage_now);
 	fclose(fd);
 
-	perc = ((float)energy_now * 1000 / (float)voltage_now) * 100; 
+	perc = ((float)energy_now * 1000 / (float)voltage_now) * 100;
     perc /= ((float)energy_full * 1000 / (float)voltage_now);
-    
+
     if(perc > 100)
         return 100;
     else
@@ -116,7 +116,7 @@ int ischarging()
 {
     int charging;
     FILE *fd;
-    
+
 	fd = fopen("/sys/class/power_supply/AC/online", "r");
 	if (fd == NULL) {
 		fprintf(stderr, "Error opening energy_now.\n");
@@ -125,7 +125,7 @@ int ischarging()
 
     fscanf(fd, "%d", &charging);
 	fclose(fd);
-    
+
     return charging;
 }
 
@@ -166,7 +166,7 @@ char *getaddress(char *interface)
                 connection_type = WIRED;
                 ifinal = ifa;
             }
-        
+
             if (strcmp(ifa->ifa_name, "wlan0") == 0)
                 if (connection_type != WIRED && connection_type != WLANV6) {
                     connection_type = WLAN;
@@ -196,7 +196,7 @@ char *getaddress(char *interface)
 
     if (connection_type == NONE)
         snprintf(buf, 200, "lo:::1");
-    
+
     else {
         switch (ifinal->ifa_addr->sa_family) {
             case AF_INET:
@@ -233,7 +233,7 @@ int main(void) {
 
     if((status = malloc(200)) == NULL)
         exit(1);
-    
+
     for (;;sleep(1)) {
         datetime = getdatetime();
         mem = getmeminfo();
@@ -250,7 +250,7 @@ int main(void) {
             else
                 strcpy(battext, "bat:");
         }
-        
+
         snprintf(status, 200,
                 "| %s | mem:%0.0f%% | %s%d%% | %s |",
                 address, mem, battext, bat0, datetime);
