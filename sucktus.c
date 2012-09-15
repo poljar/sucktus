@@ -112,8 +112,7 @@ int getbattery() {
         return perc;
 }
 
-int ischarging()
-{
+int ischarging() {
     int charging;
     FILE *fd;
 
@@ -137,8 +136,7 @@ enum type {
     NONE
 };
 
-char *getaddress(char *interface)
-{
+char *getaddress(char *interface) {
     struct ifaddrs *ifaddr, *ifa, *ifinal;
     int family;
     char host[INET6_ADDRSTRLEN];
