@@ -1,8 +1,3 @@
-/* made by profil 2011-12-29.
-**
-** Compile with:
-** gcc -Wall -pedantic -lX11 status.c
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
