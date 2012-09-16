@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <signal.h>
 #include <X11/Xlib.h>
 
 #include <sys/types.h>
@@ -10,6 +11,17 @@
 #include <arpa/inet.h>
 
 static Display *dpy;
+
+void *xmalloc(size_t size) {
+    void *p;
+
+    if (!(p = malloc(size))) {
+        fprintf(stderr, "Not enough memory!\n");
+        raise(SIGQUIT);
+    }
+
+    return p;
+}
 
 void setstatus(char *str) {
     XStoreName(dpy, DefaultRootWindow(dpy), str);
@@ -52,10 +64,7 @@ char *getdatetime() {
     time_t result;
     struct tm *resulttm;
 
-    if ((buf = malloc(sizeof(char)*65)) == NULL) {
-        fprintf(stderr, "Cannot allocate memory for buf.\n");
-        exit(1);
-    }
+    buf = xmalloc(70);
     result = time(NULL);
     resulttm = localtime(&result);
     if (resulttm == NULL) {
@@ -138,10 +147,7 @@ char *getaddress() {
     char *buf;
     enum type connection_type = NONE;
 
-    if ((buf = malloc(200)) == NULL) {
-        fprintf(stderr, "Cannot allocate memory for buf.\n");
-        exit(1);
-    }
+    buf = xmalloc(200);
 
     if (getifaddrs(&ifaddr) == -1) {
         perror("getifaddrs");
