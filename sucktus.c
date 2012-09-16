@@ -131,8 +131,8 @@ enum type {
     NONE
 };
 
-char *getaddress(char *interface) {
-    struct ifaddrs *ifaddr, *ifa, *ifinal;
+char *getaddress() {
+    struct ifaddrs *ifaddr, *ifa, *ifinal = NULL;
     int family;
     char host[INET6_ADDRSTRLEN];
     char *buf;
@@ -231,7 +231,7 @@ int main(void) {
         datetime = getdatetime();
         mem = getmeminfo();
         bat0 = getbattery();
-        address = getaddress("wlan0");
+        address = getaddress();
 
         if (ischarging())
             strcpy(battext, "ac:");
