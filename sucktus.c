@@ -71,7 +71,7 @@ char *getdatetime() {
         fprintf(stderr, "Error getting localtime.\n");
         exit(1);
     }
-    if (!strftime(buf, sizeof(char)*65-1, "%a %b %d %H:%M:%S", resulttm)) {
+    if (!strftime(buf, sizeof(char)*70-1, "%a %b %d %H:%M:%S", resulttm)) {
         fprintf(stderr, "strftime is 0.\n");
         exit(1);
     }
@@ -85,24 +85,24 @@ int getbattery() {
 
     fd = fopen("/sys/class/power_supply/BAT0/charge_now", "r");
     if (fd == NULL) {
-            fprintf(stderr, "Error opening energy_now.\n");
-            return -1;
+        fprintf(stderr, "Error opening energy_now.\n");
+        return -1;
     }
     fscanf(fd, "%d", &energy_now);
     fclose(fd);
 
     fd = fopen("/sys/class/power_supply/BAT0/charge_full", "r");
     if (fd == NULL) {
-            fprintf(stderr, "Error opening energy_full.\n");
-            return -1;
+        fprintf(stderr, "Error opening energy_full.\n");
+        return -1;
     }
     fscanf(fd, "%d", &energy_full);
     fclose(fd);
 
     fd = fopen("/sys/class/power_supply/BAT0/voltage_now", "r");
     if (fd == NULL) {
-            fprintf(stderr, "Error opening voltage_now.\n");
-            return -1;
+        fprintf(stderr, "Error opening voltage_now.\n");
+        return -1;
     }
     fscanf(fd, "%d", &voltage_now);
     fclose(fd);
@@ -120,14 +120,14 @@ int ischarging() {
     int charging;
     FILE *fd;
 
-        fd = fopen("/sys/class/power_supply/AC/online", "r");
-        if (fd == NULL) {
-                fprintf(stderr, "Error opening energy_now.\n");
-                return -1;
-        }
+    fd = fopen("/sys/class/power_supply/AC/online", "r");
+    if (fd == NULL) {
+        fprintf(stderr, "Error opening energy_now.\n");
+        return -1;
+    }
 
     fscanf(fd, "%d", &charging);
-        fclose(fd);
+    fclose(fd);
 
     return charging;
 }
@@ -230,8 +230,7 @@ int main(void) {
         return 1;
     }
 
-    if ((status = malloc(200)) == NULL)
-        exit(1);
+    status = xmalloc(200);
 
     for (;;sleep(1)) {
         datetime = getdatetime();
