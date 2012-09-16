@@ -71,34 +71,34 @@ char *getdatetime() {
 }
 
 int getbattery() {
-	FILE *fd;
-	int energy_now, energy_full, voltage_now, perc;
+        FILE *fd;
+        int energy_now, energy_full, voltage_now, perc;
 
-	fd = fopen("/sys/class/power_supply/BAT0/charge_now", "r");
-	if (fd == NULL) {
-		fprintf(stderr, "Error opening energy_now.\n");
-		return -1;
-	}
-	fscanf(fd, "%d", &energy_now);
-	fclose(fd);
+        fd = fopen("/sys/class/power_supply/BAT0/charge_now", "r");
+        if (fd == NULL) {
+                fprintf(stderr, "Error opening energy_now.\n");
+                return -1;
+        }
+        fscanf(fd, "%d", &energy_now);
+        fclose(fd);
 
-	fd = fopen("/sys/class/power_supply/BAT0/charge_full", "r");
-	if (fd == NULL) {
-		fprintf(stderr, "Error opening energy_full.\n");
-		return -1;
-	}
-	fscanf(fd, "%d", &energy_full);
-	fclose(fd);
+        fd = fopen("/sys/class/power_supply/BAT0/charge_full", "r");
+        if (fd == NULL) {
+                fprintf(stderr, "Error opening energy_full.\n");
+                return -1;
+        }
+        fscanf(fd, "%d", &energy_full);
+        fclose(fd);
 
-	fd = fopen("/sys/class/power_supply/BAT0/voltage_now", "r");
-	if (fd == NULL) {
-		fprintf(stderr, "Error opening voltage_now.\n");
-		return -1;
-	}
-	fscanf(fd, "%d", &voltage_now);
-	fclose(fd);
+        fd = fopen("/sys/class/power_supply/BAT0/voltage_now", "r");
+        if (fd == NULL) {
+                fprintf(stderr, "Error opening voltage_now.\n");
+                return -1;
+        }
+        fscanf(fd, "%d", &voltage_now);
+        fclose(fd);
 
-	perc = ((float)energy_now * 1000 / (float)voltage_now) * 100;
+        perc = ((float)energy_now * 1000 / (float)voltage_now) * 100;
     perc /= ((float)energy_full * 1000 / (float)voltage_now);
 
     if (perc > 100)
@@ -111,14 +111,14 @@ int ischarging() {
     int charging;
     FILE *fd;
 
-	fd = fopen("/sys/class/power_supply/AC/online", "r");
-	if (fd == NULL) {
-		fprintf(stderr, "Error opening energy_now.\n");
-		return -1;
-	}
+        fd = fopen("/sys/class/power_supply/AC/online", "r");
+        if (fd == NULL) {
+                fprintf(stderr, "Error opening energy_now.\n");
+                return -1;
+        }
 
     fscanf(fd, "%d", &charging);
-	fclose(fd);
+        fclose(fd);
 
     return charging;
 }
