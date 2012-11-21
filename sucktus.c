@@ -5,6 +5,7 @@
 #include <time.h>
 #include <signal.h>
 #include <X11/Xlib.h>
+#include <alsa/asoundlib.h>
 
 #include <sys/types.h>
 #include <ifaddrs.h>
@@ -57,6 +58,41 @@ float getmeminfo() {
     perc *= 100;
 
     return perc;
+}
+
+char *getvolume() {
+    char *buf;
+    int active;
+    long volume, min, max;
+    snd_mixer_t *handle;
+    snd_mixer_selem_id_t *sid;
+    snd_mixer_elem_t* elem;
+    const char *card = "default";
+    const char *selem_name = "Master";
+
+    snd_mixer_open(&handle, 0);
+    snd_mixer_attach(handle, card);
+    snd_mixer_selem_register(handle, NULL, NULL);
+    snd_mixer_load(handle);
+
+    snd_mixer_selem_id_alloca(&sid);
+    snd_mixer_selem_id_set_index(sid, 0);
+    snd_mixer_selem_id_set_name(sid, selem_name);
+    elem = snd_mixer_find_selem(handle, sid);
+
+    snd_mixer_selem_get_playback_volume_range(elem, &min, &max);
+    snd_mixer_selem_get_playback_volume(elem, SND_MIXER_SCHN_FRONT_LEFT, &volume);
+    snd_mixer_selem_get_playback_switch(elem, SND_MIXER_SCHN_FRONT_LEFT, &active);
+
+    buf = xmalloc(10);
+    if (active)
+        snprintf(buf, 10, "%0.f%%", (double) volume / (double) max * 100);
+    else
+        snprintf(buf, 10, "off");
+
+    snd_mixer_close(handle);
+
+    return buf;
 }
 
 char *getdatetime() {
@@ -224,6 +260,7 @@ int main(void) {
     char *datetime;
     char *address;
     char battext[6];
+    char *volume;
 
     if (!(dpy = XOpenDisplay(NULL))) {
         fprintf(stderr, "Cannot open display.\n");
@@ -237,6 +274,7 @@ int main(void) {
         mem = getmeminfo();
         bat0 = getbattery();
         address = getaddress();
+        volume = getvolume();
 
         if (ischarging())
             strcpy(battext, "ac:");
@@ -250,11 +288,12 @@ int main(void) {
         }
 
         snprintf(status, 200,
-                "| %s | mem:%0.0f%% | %s%d%% | %s |",
-                address, mem, battext, bat0, datetime);
+                "|%s|mem:%0.0f%%|%s%d%%|vol:%s|%s|",
+                address, mem, battext, bat0, volume, datetime);
 
         free(datetime);
         free(address);
+        free(volume);
         setstatus(status);
     }
 
