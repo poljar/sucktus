@@ -83,7 +83,7 @@ int getbattery() {
     FILE *fd;
     int energy_now, energy_full, voltage_now, perc;
 
-    fd = fopen("/sys/class/power_supply/BAT0/charge_now", "r");
+    fd = fopen("/sys/class/power_supply/BAT0/energy_now", "r");
     if (fd == NULL) {
         fprintf(stderr, "Error opening energy_now.\n");
         return -1;
@@ -91,7 +91,7 @@ int getbattery() {
     fscanf(fd, "%d", &energy_now);
     fclose(fd);
 
-    fd = fopen("/sys/class/power_supply/BAT0/charge_full", "r");
+    fd = fopen("/sys/class/power_supply/BAT0/energy_full", "r");
     if (fd == NULL) {
         fprintf(stderr, "Error opening energy_full.\n");
         return -1;
@@ -110,7 +110,7 @@ int getbattery() {
     perc = ((float)energy_now * 1000 / (float)voltage_now) * 100;
     perc /= ((float)energy_full * 1000 / (float)voltage_now);
 
-    if (perc > 100)
+    if (perc >= 99)
         return 100;
     else
         return perc;
@@ -241,9 +241,9 @@ int main(void) {
         if (ischarging())
             strcpy(battext, "ac:");
         else {
-            if (bat0 > 70)
+            if (bat0 > 50)
                 strcpy(battext, "bat:");
-            else if (bat0 < 40)
+            else if (bat0 < 20)
                 strcpy(battext, "bat:");
             else
                 strcpy(battext, "bat:");
